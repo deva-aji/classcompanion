@@ -1,0 +1,140 @@
+[
+    {
+        "day": "Tuesday",
+        "subject": "Robotics",
+        "room": "Robotics lab",
+        "start": "10:00 AM",
+        "end": "11:00 AM"
+    },
+    {
+        "subject": "C Programming",
+        "room": "Computer lab",
+        "start": "11:00 AM",
+        "end": "01:00 AM",
+        "type": "weekly",
+        "day": "Wednesday",
+        "deleted_dates": [
+            "2026-09-30"
+        ]
+    },
+    {
+        "subject": "C Programming",
+        "room": "Computer lab",
+        "start": "11:00 AM",
+        "end": "01:00 AM",
+        "type": "specific",
+        "date": "2026-10-22",
+        "day": "Thursday"
+    },
+    {
+        "subject": "ai",
+        "room": "room 401",
+        "start": "09:00 PM",
+        "end": "10:00 PM",
+        "type": "specific",
+        "date": "2026-10-03",
+        "day": "Saturday"
+    },
+    {
+        "subject": "ai",
+        "room": "room 201",
+        "start": "10:00 PM",
+        "end": "11:00 PM",
+        "type": "specific",
+        "date": "2026-10-04",
+        "day": "Sunday"
+    },
+    {
+        "subject": "AI test",
+        "room": "Room 201",
+        "start": "10:30 AM",
+        "end": "11:30 AM",
+        "type": "specific",
+        "date": "2026-10-13",
+        "day": "Tuesday"
+    },
+    {
+        "subject": "Programming test",
+        "room": "Room 201",
+        "start": "10:00 AM",
+        "end": "11:00 AM",
+        "type": "weekly",
+        "day": "Tuesday",
+        "deleted_dates": [
+            "2026-10-13",
+            "2026-10-06"
+        ]
+    },
+    {
+        "subject": "science ",
+        "room": "room 301",
+        "start": "06:00 AM",
+        "end": "07:00 AM",
+        "type": "specific",
+        "date": "2026-10-14",
+        "day": "Wednesday"
+    },
+    {
+        "subject": "science",
+        "room": "room 301",
+        "start": "10:30 AM",
+        "end": "11:30 AM",
+        "type": "specific",
+        "date": "2026-10-16",
+        "day": "Friday"
+    },
+    {
+        "subject": "science",
+        "room": "room 301",
+        "start": "09:00 AM",
+        "end": "10:00 AM",
+        "type": "specific",
+        "date": "2026-10-08",
+        "day": "Thursday"
+    },
+    {
+        "subject": "physics",
+        "room": "room 301",
+        "start": "10:00 AM",
+        "end": "09:00 AM",
+        "type": "specific",
+        "date": "2026-10-09",
+        "day": "Friday"
+    },
+    {
+        "subject": "geography",
+        "room": "room 301",
+        "start": "01:00 PM",
+        "end": "02:00 PM",
+        "type": "specific",
+        "date": "2026-10-09",
+        "day": "Friday"
+    },
+    {
+        "subject": "geography",
+        "room": "room 301",
+        "start": "01:00 PM",
+        "end": "02:00 PM",
+        "type": "specific",
+        "date": "2026-10-10",
+        "day": "Saturday"
+    },
+    {
+        "subject": "physics",
+        "room": "201",
+        "start": "10:30 AM",
+        "end": "11:30 AM",
+        "type": "specific",
+        "date": "2026-10-05",
+        "day": "Monday"
+    },
+    {
+        "subject": "ai",
+        "room": "201",
+        "start": "10:00 AM",
+        "end": "11:00 AM",
+        "type": "specific",
+        "date": "2026-10-13",
+        "day": "Tuesday"
+    }
+]
