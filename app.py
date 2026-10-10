@@ -2042,19 +2042,14 @@ def proactive_class_reminder():
 proactive_class_reminder()
 
 # -------------------------
-
 # AI STUDENT ASSISTANT
-
 # -------------------------
 
 st.header("🤖 Ask Your Student Assistant")
 
 question = st.text_input(
-
     "Ask something about your timetable:",
-
     placeholder="Example: When is my next class?"
-
 )
 
 if question:
@@ -2062,67 +2057,43 @@ if question:
     q = question.lower()
 
     # -------------------------
-
     # HELPER: ADD MONTHS
-
     # -------------------------
 
     def add_months(original_date, months):
-
         month = original_date.month - 1 + months
-
         year = original_date.year + month // 12
-
         month = month % 12 + 1
-
         return date(year, month, 1)
 
     # -------------------------
-
     # DATE RANGE
-
     # -------------------------
 
     today = date.today()
 
     start_month = add_months(
-
         date(today.year, today.month, 1),
-
         -2
-
     )
 
     end_month = add_months(
-
         date(today.year, today.month, 1),
-
         2
-
     )
 
     end_date = (
-
         end_month
-
         + timedelta(
-
             days=calendar.monthrange(
-
                 end_month.year,
-
                 end_month.month
-
             )[1] - 1
-
         )
-
     )
 
     # -------------------------
-
     # BUILD UPCOMING CLASSES
-
     # -------------------------
 
     upcoming = []
@@ -2136,1089 +2107,561 @@ if question:
         for c in st.session_state.classes:
 
             # Weekly classes
-
             if (
-
                 c.get("type") == "weekly"
-
                 and c.get("day") == current_day
-
                 and current_date.strftime("%Y-%m-%d")
-
-                    not in c.get("deleted_dates",[])
-
+                    not in c.get("deleted_dates", [])
             ):
 
                 upcoming.append({
-
                     "date": current_date,
-
                     "subject": c["subject"],
-
                     "room": c["room"],
-
                     "start": c["start"],
-
                     "end": c["end"]
-
                 })
 
             # Specific-date classes
-
             elif (
-
                 c.get("type") == "specific"
-
                 and c.get("date")
-
-                == current_date.strftime("%Y-%m-%d")
-
+                    == current_date.strftime("%Y-%m-%d")
             ):
 
                 upcoming.append({
-
                     "date": current_date,
-
                     "subject": c["subject"],
-
                     "room": c["room"],
-
                     "start": c["start"],
-
                     "end": c["end"]
-
                 })
 
         current_date += timedelta(days=1)
 
     upcoming.sort(
-
-        key=lambda x: (x["date"], time_to_minutes(x["start"]) if time_to_minutes(x["start"]) is not None else 0)
-
+        key=lambda x: (
+            x["date"],
+            time_to_minutes(x["start"])
+            if time_to_minutes(x["start"]) is not None
+            else 0
+        )
     )
 
     # -------------------------
+    # CURRENT TIME
+    # -------------------------
 
+    from datetime import datetime
+
+    now = datetime.now()
+    current_minutes = now.hour * 60 + now.minute
+
+    # -------------------------
     # FIND SUBJECT
-
     # -------------------------
 
     matched_subject = None
 
     subjects = list(
-
         set(
-
             c["subject"]
-
             for c in st.session_state.classes
-
         )
-
     )
 
     subjects.sort(
-
         key=len,
-
         reverse=True
-
     )
 
     for subject in subjects:
-
         if subject.lower() in q:
-
             matched_subject = subject
-
             break
 
     # -------------------------
-
     # FIND DATE
-
     # -------------------------
 
     reference_date = today
 
     for i in range(
-
         (end_date - start_month).days + 1
-
     ):
 
         possible_date = (
-
-            start_month
-
-            + timedelta(days=i)
-
+            start_month + timedelta(days=i)
         )
 
-        day_number = str(
-
-            possible_date.day
-
-        )
+        day_number = str(possible_date.day)
 
         month_name = (
-
-            possible_date
-
-            .strftime("%B")
-
-            .lower()
-
+            possible_date.strftime("%B").lower()
         )
 
         if (
-
             day_number in q
-
             and month_name in q
-
         ):
-
             reference_date = possible_date
-
             break
 
     # =====================================================
-
-    # NEW FEATURE 1
-
-    # HOW MANY CLASSES?
-
+    # FEATURE 1: HOW MANY CLASSES?
     # =====================================================
 
     if (
-
         "how many" in q
-
         and "class" in q
-
     ):
 
         # TODAY
-
         if "today" in q:
 
             matching = [
-
                 c for c in upcoming
-
                 if c["date"] == today
-
             ]
 
             if matched_subject:
-
                 matching = [
-
                     c for c in matching
-
                     if c["subject"].lower()
-
                     == matched_subject.lower()
-
                 ]
 
             st.success(
-
                 f"You have **{len(matching)}** "
-
                 f"{matched_subject + ' ' if matched_subject else ''}"
-
                 f"class(es) today."
-
             )
 
         # THIS WEEK
-
         elif "this week" in q:
 
             week_start = today - timedelta(
-
                 days=today.weekday()
-
             )
 
-            week_end = week_start + timedelta(
-
-                days=6
-
-            )
+            week_end = week_start + timedelta(days=6)
 
             matching = [
-
                 c for c in upcoming
-
-                if (
-
-                    week_start
-
-                    <= c["date"]
-
-                    <= week_end
-
-                )
-
+                if week_start <= c["date"] <= week_end
             ]
 
             if matched_subject:
-
                 matching = [
-
                     c for c in matching
-
                     if c["subject"].lower()
-
                     == matched_subject.lower()
-
                 ]
 
             st.success(
-
                 f"You have **{len(matching)}** "
-
                 f"{matched_subject + ' ' if matched_subject else ''}"
-
                 f"class(es) this week."
-
             )
 
         # THIS MONTH
-
         elif (
-
             "this month" in q
-
             or "month" in q
-
         ):
 
             matching = [
-
                 c for c in upcoming
-
                 if (
-
-                    c["date"].month
-
-                    == today.month
-
-                    and c["date"].year
-
-                    == today.year
-
+                    c["date"].month == today.month
+                    and c["date"].year == today.year
                 )
-
             ]
 
             if matched_subject:
-
                 matching = [
-
                     c for c in matching
-
                     if c["subject"].lower()
-
                     == matched_subject.lower()
-
                 ]
 
             st.success(
-
                 f"You have **{len(matching)}** "
-
                 f"{matched_subject + ' ' if matched_subject else ''}"
-
                 f"class(es) this month."
-
             )
 
     # =====================================================
-
-    # NEW FEATURE 2
-
-    # FIRST CLASS
-
+    # FEATURE 2: FIRST CLASS
     # =====================================================
 
     elif (
-
         "first class" in q
-
         or "first class today" in q
-
     ):
 
         matching = [
-
             c for c in upcoming
-
             if c["date"] == today
-
         ]
 
         if matched_subject:
-
             matching = [
-
                 c for c in matching
-
                 if c["subject"].lower()
-
                 == matched_subject.lower()
-
             ]
 
         if matching:
-
             c = matching[0]
 
             st.success(
-
                 f"Your first class today is "
-
                 f"**{c['subject']}** at **{c['start']}** "
-
                 f"in **{c['room']}**."
-
             )
 
         else:
-
             st.info(
-
                 "You don't have any matching classes today."
-
             )
 
     # =====================================================
-
-    # NEW FEATURE 3
-
-    # LAST CLASS
-
+    # FEATURE 3: LAST CLASS
     # =====================================================
 
     elif (
-
         "last class" in q
-
         or "last class today" in q
-
     ):
 
         matching = [
-
             c for c in upcoming
-
             if c["date"] == today
-
         ]
 
         if matched_subject:
-
             matching = [
-
                 c for c in matching
-
                 if c["subject"].lower()
-
                 == matched_subject.lower()
-
             ]
 
         if matching:
-
             c = matching[-1]
 
             st.success(
-
                 f"Your last class today is "
-
                 f"**{c['subject']}** at **{c['start']}** "
-
                 f"in **{c['room']}**."
-
             )
 
         else:
-
             st.info(
-
                 "You don't have any matching classes today."
-
             )
 
     # =====================================================
-
-    # NEW FEATURE 4
-
-    # BUSIEST DAY
-
+    # FEATURE 4: BUSIEST DAY
     # =====================================================
 
     elif (
-
         "busiest day" in q
-
         or "busy day" in q
-
     ):
 
         day_counts = {}
 
         for c in upcoming:
-
             if (
-
                 c["date"] >= today
-
                 and c["date"] < today + timedelta(days=7)
-
             ):
 
-                day_name = c["date"].strftime(
-
-                    "%A"
-
-                )
+                day_name = c["date"].strftime("%A")
 
                 day_counts[day_name] = (
-
                     day_counts.get(day_name, 0) + 1
-
                 )
 
         if day_counts:
 
             busiest_day = max(
-
                 day_counts,
-
                 key=day_counts.get
-
             )
 
             count = day_counts[busiest_day]
 
             st.success(
-
                 f"Your busiest day this week is "
-
                 f"**{busiest_day}** with "
-
                 f"**{count} classes**."
-
             )
 
         else:
-
             st.info(
-
                 "I couldn't find enough classes "
-
                 "to determine your busiest day."
-
             )
 
     # =====================================================
-
-    # NEW FEATURE 6
-
-    # CLASSES IN A SPECIFIC WEEK OF A MONTH
-
+    # FEATURE 5: CLASSES IN A SPECIFIC WEEK OF A MONTH
     # =====================================================
 
     elif (
-
         (
-
             "week" in q
-
             or "weeks" in q
-
         )
-
         and any(
-
             ordinal in q
-
             for ordinal in [
-
-                "1st",
-
-                "2nd",
-
-                "3rd",
-
-                "4th",
-
-                "5th",
-
-                "first",
-
-                "second",
-
-                "third",
-
-                "fourth",
-
-                "fifth"
-
+                "1st", "2nd", "3rd", "4th", "5th",
+                "first", "second", "third", "fourth", "fifth"
             ]
-
         )
-
         and any(
-
             month in q
-
             for month in [
-
-                "january",
-
-                "february",
-
-                "march",
-
-                "april",
-
-                "may",
-
-                "june",
-
-                "july",
-
-                "august",
-
-                "september",
-
-                "october",
-
-                "november",
-
-                "december"
-
+                "january", "february", "march", "april",
+                "may", "june", "july", "august",
+                "september", "october", "november", "december"
             ]
-
         )
-
     ):
-
-        # -------------------------
-
-        # FIND WEEK NUMBER
-
-        # -------------------------
 
         week_number = None
 
         if "1st" in q or "first" in q:
-
             week_number = 1
-
         elif "2nd" in q or "second" in q:
-
             week_number = 2
-
         elif "3rd" in q or "third" in q:
-
             week_number = 3
-
         elif "4th" in q or "fourth" in q:
-
             week_number = 4
-
         elif "5th" in q or "fifth" in q:
-
             week_number = 5
-
-        # -------------------------
-
-        # FIND MONTH
-
-        # -------------------------
 
         requested_month = None
 
         for month_number in range(1, 13):
-
-            month_name = (
-
-                calendar.month_name[month_number]
-
-                .lower()
-
-            )
+            month_name = calendar.month_name[month_number].lower()
 
             if month_name in q:
-
                 requested_month = month_number
-
                 break
-
-        # -------------------------
-
-        # FIND YEAR
-
-        # -------------------------
 
         requested_year = today.year
 
-        # If a year is mentioned, use it
-
-        for year in range(
-
-            today.year - 5,
-
-            today.year + 6
-
-        ):
-
+        for year in range(today.year - 5, today.year + 6):
             if str(year) in q:
-
                 requested_year = year
-
                 break
 
-        # -------------------------
-
-        # FIND CALENDAR WEEK DATES
-
-        # Monday - Sunday
-
-        # -------------------------
-
         first_day = date(
-
             requested_year,
-
             requested_month,
-
             1
-
         )
-
-        # Find the Monday of the first calendar week
 
         first_monday = (
-
-            first_day
-
-            - timedelta(days=first_day.weekday())
-
+            first_day - timedelta(days=first_day.weekday())
         )
-
-        # Find the requested Monday
 
         week_start = (
-
-            first_monday
-
-            + timedelta(days=(week_number - 1) * 7)
-
+            first_monday + timedelta(days=(week_number - 1) * 7)
         )
-
-        # Sunday of that calendar week
 
         week_end = week_start + timedelta(days=6)
 
-        # -------------------------
-
-        # FIND CLASSES
-
-        # -------------------------
-
         week_classes = []
-
         current_week_date = week_start
 
         while current_week_date <= week_end:
 
-            current_day = (
-
-                current_week_date.strftime("%A")
-
-            )
-
-            date_string = (
-
-                current_week_date.strftime("%Y-%m-%d")
-
-            )
+            current_day = current_week_date.strftime("%A")
+            date_string = current_week_date.strftime("%Y-%m-%d")
 
             for c in st.session_state.classes:
 
-                # WEEKLY CLASS
-
                 if (
-
                     c.get("type") == "weekly"
-
                     and c.get("day") == current_day
-
-                    and date_string
-
-                        not in c.get(
-
-                            "deleted_dates",
-
-                            []
-
-                        )
-
+                    and date_string not in c.get("deleted_dates", [])
                 ):
 
                     week_classes.append({
-
                         "date": current_week_date,
-
                         "subject": c["subject"],
-
                         "room": c["room"],
-
                         "start": c["start"],
-
                         "end": c["end"]
-
                     })
 
-                # SPECIFIC-DATE CLASS
-
                 elif (
-
                     c.get("type") == "specific"
-
                     and c.get("date") == date_string
-
                 ):
 
                     week_classes.append({
-
                         "date": current_week_date,
-
                         "subject": c["subject"],
-
                         "room": c["room"],
-
                         "start": c["start"],
-
                         "end": c["end"]
-
                     })
 
             current_week_date += timedelta(days=1)
 
-        # -------------------------
-
-        # FILTER SUBJECT
-
-        # -------------------------
-
         if matched_subject:
-
             week_classes = [
-
                 c for c in week_classes
-
-                if c["subject"].lower()
-
-                == matched_subject.lower()
-
+                if c["subject"].lower() == matched_subject.lower()
             ]
 
-        # -------------------------
-
-        # SORT CLASSES
-
-        # -------------------------
-
         week_classes.sort(
-
             key=lambda x: (
-
                 x["date"],
-
-                x["start"]
-
+                time_to_minutes(x["start"])
+                if time_to_minutes(x["start"]) is not None
+                else 0
             )
-
         )
-
-        # -------------------------
-
-        # DISPLAY
-
-        # -------------------------
 
         if week_classes:
 
             st.success(
-
                 f"Here are your classes for the "
-
                 f"{week_number}th week of "
-
                 f"{calendar.month_name[requested_month]} "
-
                 f"{requested_year}:"
-
             )
 
             for c in week_classes:
-
                 st.write(
-
                     f"📅 **{c['date'].strftime('%A, %d %B')}** — "
-
                     f"📚 **{c['subject']}** — "
-
                     f"🕐 {c['start']} – {c['end']} — "
-
                     f"🏫 {c['room']}"
-
                 )
 
         else:
-
             st.info(
-
                 f"You don't have any classes in the "
-
                 f"{week_number}th week of "
-
                 f"{calendar.month_name[requested_month]} "
-
                 f"{requested_year}."
-
             )
 
     # =====================================================
-
-    # NEW FEATURE 5
-
-    # CLASSES THIS WEEK
-
+    # FEATURE 6: CLASSES THIS WEEK
     # =====================================================
 
     elif (
-
         (
-
             "what classes" in q
-
-             or "which classes" in q
-
-             or "classes this week" in q
-
-             or "class this week" in q
-
+            or "which classes" in q
+            or "classes this week" in q
+            or "class this week" in q
         )
-
         and (
-
             "week" in q
-
-             or "this week" in q
-
+            or "this week" in q
         )
-
     ):
 
-        week_start = today - timedelta(
-
-            days=today.weekday()
-
-        )
-
-        week_end = week_start + timedelta(
-
-            days=6
-
-        )
+        week_start = today - timedelta(days=today.weekday())
+        week_end = week_start + timedelta(days=6)
 
         week_classes = [
-
             c for c in upcoming
-
-            if (
-
-                week_start
-
-                <= c["date"]
-
-                <= week_end
-
-            )
-
+            if week_start <= c["date"] <= week_end
         ]
 
         if matched_subject:
-
             week_classes = [
-
                 c for c in week_classes
-
-                if c["subject"].lower()
-
-                == matched_subject.lower()
-
+                if c["subject"].lower() == matched_subject.lower()
             ]
 
         if week_classes:
 
-            st.success(
-
-                "Here are your classes this week:"
-
-            )
+            st.success("Here are your classes this week:")
 
             for c in week_classes:
-
                 st.write(
-
                     f"📅 **{c['date'].strftime('%A, %d %B')}** — "
-
                     f"📚 **{c['subject']}** — "
-
                     f"🕐 {c['start']} – {c['end']} — "
-
                     f"🏫 {c['room']}"
-
                 )
 
         else:
-
-            st.info(
-
-                "You don't have any classes this week."
-
-            )
+            st.info("You don't have any classes this week.")
 
     # =====================================================
-
-    # NEW FEATURE 6
-
-    # SUBJECTS THIS WEEK
-
+    # FEATURE 7: SUBJECTS THIS WEEK
     # =====================================================
 
     elif (
-
         "subjects" in q
-
         and (
-
             "this week" in q
-
             or "week" in q
-
         )
-
     ):
 
-        week_start = today - timedelta(
-
-            days=today.weekday()
-
-        )
-
-        week_end = week_start + timedelta(
-
-            days=6
-
-        )
+        week_start = today - timedelta(days=today.weekday())
+        week_end = week_start + timedelta(days=6)
 
         week_classes = [
-
             c for c in upcoming
-
-            if (
-
-                week_start
-
-                <= c["date"]
-
-                <= week_end
-
-            )
-
+            if week_start <= c["date"] <= week_end
         ]
 
         unique_subjects = []
 
         for c in week_classes:
-
             if c["subject"] not in unique_subjects:
-
-                unique_subjects.append(
-
-                    c["subject"]
-
-                )
+                unique_subjects.append(c["subject"])
 
         if unique_subjects:
 
-            st.success(
-
-                "Your subjects this week are:"
-
-            )
+            st.success("Your subjects this week are:")
 
             for subject in unique_subjects:
-
-                st.write(
-
-                    f"📚 **{subject}**"
-
-                )
+                st.write(f"📚 **{subject}**")
 
         else:
-
-            st.info(
-
-                "You don't have any classes this week."
-
-            )
+            st.info("You don't have any classes this week.")
 
     # =====================================================
-
-    # NEW FEATURE 7
-
-    # WHAT COMES AFTER A SUBJECT?
-
+    # FEATURE 8: WHAT COMES AFTER A SUBJECT?
     # =====================================================
 
     elif (
-
         "what comes after" in q
-
         or "what is after" in q
-
         or "what's after" in q
-
     ):
 
         if matched_subject:
 
             subject_classes = [
-
                 c for c in upcoming
-
                 if (
-
-                    c["subject"].lower()
-
-                    == matched_subject.lower()
-
-                    and c["date"] >= today
-
+                    c["subject"].lower() == matched_subject.lower()
+                    and (
+                        c["date"] > today
+                        or (
+                            c["date"] == today
+                            and time_to_minutes(c["start"]) is not None
+                            and time_to_minutes(c["start"]) > current_minutes
+                        )
+                    )
                 )
-
             ]
 
             if subject_classes:
@@ -3226,27 +2669,17 @@ if question:
                 reference_class = subject_classes[0]
 
                 following_classes = [
-
                     c for c in upcoming
-
                     if (
-
-                        c["date"]
-
-                        > reference_class["date"]
-
+                        c["date"] > reference_class["date"]
                         or (
-
-                            c["date"]
-
-                            == reference_class["date"]
-
-                            and time_to_minutes(c["start"]) > time_to_minutes(reference_class["start"])
-
+                            c["date"] == reference_class["date"]
+                            and time_to_minutes(c["start"]) is not None
+                            and time_to_minutes(reference_class["start"]) is not None
+                            and time_to_minutes(c["start"])
+                                > time_to_minutes(reference_class["start"])
                         )
-
                     )
-
                 ]
 
                 if following_classes:
@@ -3254,105 +2687,104 @@ if question:
                     c = following_classes[0]
 
                     st.success(
-
                         f"After your **{matched_subject}** class, "
-
                         f"you have **{c['subject']}** on "
-
                         f"**{c['date'].strftime('%A, %d %B')}** "
-
                         f"at **{c['start']}** in **{c['room']}**."
-
                     )
 
                 else:
-
-                    st.info(
-
-                        "I couldn't find another class after that."
-
-                    )
+                    st.info("I couldn't find another class after that.")
 
             else:
-
                 st.info(
-
-                    f"I couldn't find an upcoming "
-
-                    f"**{matched_subject}** class."
-
+                    f"I couldn't find an upcoming **{matched_subject}** class."
                 )
 
         else:
-
             st.info(
-
                 "Please mention the subject you want "
-
                 "to find the following class for."
-
             )
 
     # =====================================================
-
-    # TODAY
-
+    # NEXT CLASS — DATE AND CURRENT TIME
+    # This comes BEFORE the general TODAY handler.
     # =====================================================
 
-    elif (
+    elif "next" in q and "class" in q:
 
-        "today" in q
-
-        or "my class is today" in q
-
-    ):
-
-        today_classes = [
-
+        future_classes = [
             c for c in upcoming
-
-            if c["date"] == today
-
+            if (
+                c["date"] > today
+                or (
+                    c["date"] == today
+                    and time_to_minutes(c["start"]) is not None
+                    and time_to_minutes(c["start"]) > current_minutes
+                )
+            )
         ]
 
         if matched_subject:
+            future_classes = [
+                c for c in future_classes
+                if c["subject"].lower() == matched_subject.lower()
+            ]
 
+        if future_classes:
+
+            c = future_classes[0]
+
+            st.success(
+                f"Your next {matched_subject + ' ' if matched_subject else ''}"
+                f"class is **{c['subject']}** on "
+                f"**{c['date'].strftime('%A, %d %B')}** "
+                f"at **{c['start']}** in **{c['room']}**."
+            )
+
+        else:
+            if matched_subject:
+                st.info(
+                    f"No upcoming {matched_subject} classes were found."
+                )
+            else:
+                st.info("You don't have any upcoming classes.")
+
+    # =====================================================
+    # TODAY
+    # =====================================================
+
+    elif (
+        "today" in q
+        or "my class is today" in q
+    ):
+
+        today_classes = [
+            c for c in upcoming
+            if c["date"] == today
+        ]
+
+        if matched_subject:
             today_classes = [
-
                 c for c in today_classes
-
-                if c["subject"].lower()
-
-                == matched_subject.lower()
-
+                if c["subject"].lower() == matched_subject.lower()
             ]
 
         if today_classes:
 
             for c in today_classes:
-
                 st.write(
-
                     f"📚 **{c['subject']}** — "
-
                     f"🕐 {c['start']} — "
-
                     f"🏫 {c['room']}"
-
                 )
 
         else:
-
-            st.info(
-
-                "You don't have any matching classes today."
-
-            )
+            st.info("You don't have any matching classes today.")
 
     # =====================================================
-
     # BEFORE DATE
-
     # =====================================================
 
     elif "before" in q:
@@ -3360,19 +2792,11 @@ if question:
         if matched_subject:
 
             matching_classes = [
-
                 c for c in upcoming
-
                 if (
-
-                    c["subject"].lower()
-
-                    == matched_subject.lower()
-
+                    c["subject"].lower() == matched_subject.lower()
                     and c["date"] < reference_date
-
                 )
-
             ]
 
             if matching_classes:
@@ -3380,35 +2804,23 @@ if question:
                 c = matching_classes[-1]
 
                 st.success(
-
                     f"Your previous **{c['subject']}** class before "
-
                     f"**{reference_date.strftime('%d %B')}** was on "
-
                     f"**{c['date'].strftime('%A, %d %B')}** "
-
                     f"at **{c['start']}** in **{c['room']}**."
-
                 )
 
             else:
-
                 st.info(
-
                     f"I couldn't find a **{matched_subject}** class before "
-
                     f"{reference_date.strftime('%d %B')}."
-
                 )
 
         else:
 
             matching_classes = [
-
                 c for c in upcoming
-
                 if c["date"] < reference_date
-
             ]
 
             if matching_classes:
@@ -3416,33 +2828,21 @@ if question:
                 c = matching_classes[-1]
 
                 st.success(
-
                     f"The class immediately before "
-
                     f"**{reference_date.strftime('%d %B')}** is "
-
                     f"**{c['subject']}** on "
-
                     f"**{c['date'].strftime('%A, %d %B')}** "
-
                     f"at **{c['start']}** in **{c['room']}**."
-
                 )
 
             else:
-
                 st.info(
-
                     f"I couldn't find any classes before "
-
                     f"{reference_date.strftime('%d %B')}."
-
                 )
 
     # =====================================================
-
     # AFTER DATE
-
     # =====================================================
 
     elif "after" in q:
@@ -3450,19 +2850,11 @@ if question:
         if matched_subject:
 
             matching_classes = [
-
                 c for c in upcoming
-
                 if (
-
-                    c["subject"].lower()
-
-                    == matched_subject.lower()
-
+                    c["subject"].lower() == matched_subject.lower()
                     and c["date"] > reference_date
-
                 )
-
             ]
 
             if matching_classes:
@@ -3470,35 +2862,23 @@ if question:
                 c = matching_classes[0]
 
                 st.success(
-
                     f"Your next **{c['subject']}** class after "
-
                     f"**{reference_date.strftime('%d %B')}** is on "
-
                     f"**{c['date'].strftime('%A, %d %B')}** "
-
                     f"at **{c['start']}** in **{c['room']}**."
-
                 )
 
             else:
-
                 st.info(
-
                     f"I couldn't find another **{matched_subject}** class after "
-
                     f"{reference_date.strftime('%d %B')}."
-
                 )
 
         else:
 
             matching_classes = [
-
                 c for c in upcoming
-
                 if c["date"] > reference_date
-
             ]
 
             if matching_classes:
@@ -3506,203 +2886,111 @@ if question:
                 c = matching_classes[0]
 
                 st.success(
-
                     f"The first class after "
-
                     f"**{reference_date.strftime('%d %B')}** is "
-
                     f"**{c['subject']}** on "
-
                     f"**{c['date'].strftime('%A, %d %B')}** "
-
                     f"at **{c['start']}** in **{c['room']}**."
-
                 )
 
             else:
-
                 st.info(
-
                     f"I couldn't find any classes after "
-
                     f"{reference_date.strftime('%d %B')}."
-
                 )
 
     # =====================================================
-
     # SPECIFIC DATE
-
     # =====================================================
 
     elif reference_date != today:
 
         date_classes = [
-
             c for c in upcoming
-
             if c["date"] == reference_date
-
         ]
 
         if matched_subject:
-
             date_classes = [
-
                 c for c in date_classes
-
-                if c["subject"].lower()
-
-                == matched_subject.lower()
-
+                if c["subject"].lower() == matched_subject.lower()
             ]
 
         if date_classes:
 
             for c in date_classes:
-
                 st.write(
-
                     f"📚 **{c['subject']}** — "
-
                     f"🕐 {c['start']} — "
-
                     f"🏫 {c['room']}"
-
                 )
 
         else:
-
             st.info(
-
                 f"I couldn't find any classes on "
-
                 f"{reference_date.strftime('%d %B')}."
-
             )
 
     # =====================================================
-
     # MONTH SEARCH
-
     # =====================================================
 
     elif any(
-
         month in q
-
         for month in [
-
-            "january",
-
-            "february",
-
-            "march",
-
-            "april",
-
-            "may",
-
-            "june",
-
-            "july",
-
-            "august",
-
-            "september",
-
-            "october",
-
-            "november",
-
-            "december"
-
+            "january", "february", "march", "april",
+            "may", "june", "july", "august",
+            "september", "october", "november", "december"
         ]
-
     ):
 
         requested_month = None
 
         for month_number in range(1, 13):
 
-            month_name = (
-
-                calendar.month_name[month_number]
-
-                .lower()
-
-            )
+            month_name = calendar.month_name[month_number].lower()
 
             if month_name in q:
-
                 requested_month = month_number
-
                 break
 
         month_classes = [
-
             c for c in upcoming
-
-            if c["date"].month
-
-            == requested_month
-
+            if c["date"].month == requested_month
         ]
 
         if matched_subject:
-
             month_classes = [
-
                 c for c in month_classes
-
-                if c["subject"].lower()
-
-                == matched_subject.lower()
-
+                if c["subject"].lower() == matched_subject.lower()
             ]
 
         if month_classes:
 
             for c in month_classes:
-
                 st.write(
-
                     f"📅 **{c['date'].strftime('%A, %d %B')}** — "
-
                     f"📚 **{c['subject']}** — "
-
                     f"🕐 {c['start']} — "
-
                     f"🏫 {c['room']}"
-
                 )
 
         else:
 
             if matched_subject:
-
                 st.info(
-
                     f"I couldn't find any **{matched_subject}** classes "
-
                     f"in {calendar.month_name[requested_month]}."
-
                 )
 
             else:
-
                 st.info(
-
                     f"You don't have any classes in "
-
                     f"{calendar.month_name[requested_month]}."
-
                 )
 
     # =====================================================
-
     # TOMORROW
-
     # =====================================================
 
     elif "tomorrow" in q:
@@ -3710,133 +2998,30 @@ if question:
         tomorrow = today + timedelta(days=1)
 
         tomorrow_classes = [
-
             c for c in upcoming
-
             if c["date"] == tomorrow
-
         ]
 
         if matched_subject:
-
             tomorrow_classes = [
-
                 c for c in tomorrow_classes
-
-                if c["subject"].lower()
-
-                == matched_subject.lower()
-
+                if c["subject"].lower() == matched_subject.lower()
             ]
 
         if tomorrow_classes:
 
             for c in tomorrow_classes:
-
                 st.write(
-
                     f"📚 **{c['subject']}** — "
-
                     f"🕐 {c['start']} — "
-
                     f"🏫 {c['room']}"
-
                 )
 
         else:
-
-            st.info(
-
-                "You don't have any matching classes tomorrow."
-
-            )
+            st.info("You don't have any matching classes tomorrow.")
 
     # =====================================================
-
-    # NEXT CLASS
-
-    # =====================================================
-
-    elif "next" in q and "class" in q:
-
-        if matched_subject:
-
-            matching_classes = [
-
-                c for c in upcoming
-
-                if (
-
-                    c["subject"].lower()
-
-                    == matched_subject.lower()
-
-                    and c["date"] >= today
-
-                )
-
-            ]
-
-            if matching_classes:
-
-                c = matching_classes[0]
-
-                st.success(
-
-                    f"Your next **{c['subject']}** class is on "
-
-                    f"**{c['date'].strftime('%A, %d %B')}** "
-
-                    f"at **{c['start']}** in **{c['room']}**."
-
-                )
-
-            else:
-
-                st.info(
-
-                    f"I couldn't find any upcoming "
-
-                    f"**{matched_subject}** classes."
-
-                )
-
-        else:
-
-            future_classes = [
-
-                c for c in upcoming
-
-                if c["date"] >= today
-
-            ]
-
-            if future_classes:
-
-                c = future_classes[0]
-
-                st.success(
-
-                    f"Your next class is **{c['subject']}** "
-
-                    f"on **{c['date'].strftime('%A, %d %B')}** "
-
-                    f"at **{c['start']}** in **{c['room']}**."
-
-                )
-
-            else:
-
-                st.info(
-
-                    "You don't have any upcoming classes."
-
-                )
-
-    # =====================================================
-
     # WHERE / ROOM
-
     # =====================================================
 
     elif "where" in q or "room" in q:
@@ -3848,57 +3033,33 @@ if question:
             for c in upcoming:
 
                 if (
-
-                    c["subject"].lower()
-
-                    == matched_subject.lower()
-
+                    c["subject"].lower() == matched_subject.lower()
                     and c["date"] >= today
-
                 ):
 
                     st.success(
-
                         f"Your **{c['subject']}** class is in "
-
                         f"**{c['room']}** on "
-
                         f"**{c['date'].strftime('%A, %d %B')}** "
-
                         f"at **{c['start']}**."
-
                     )
 
                     found = True
-
                     break
 
         if not found:
-
-            st.info(
-
-                "I couldn't find that subject in your timetable."
-
-            )
+            st.info("I couldn't find that subject in your timetable.")
 
     # =====================================================
-
     # DEFAULT
-
     # =====================================================
 
     else:
 
         st.info(
-
             "Try asking about your next class, "
-
             "a subject, a classroom, today, tomorrow, "
-
             "a specific date, a month, "
-
             "class counts, your busiest day, "
-
             "or a class before or after a specific date."
-
         )

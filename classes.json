@@ -66,15 +66,6 @@
         ]
     },
     {
-        "subject": "science ",
-        "room": "room 301",
-        "start": "06:00 AM",
-        "end": "07:00 AM",
-        "type": "specific",
-        "date": "2026-10-14",
-        "day": "Wednesday"
-    },
-    {
         "subject": "science",
         "room": "room 301",
         "start": "10:30 AM",
@@ -136,5 +127,14 @@
         "type": "specific",
         "date": "2026-10-13",
         "day": "Tuesday"
+    },
+    {
+        "subject": "robotics",
+        "room": "201",
+        "start": "09:00 AM",
+        "end": "10:00 AM",
+        "type": "specific",
+        "date": "2026-10-12",
+        "day": "Monday"
     }
 ]
