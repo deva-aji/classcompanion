@@ -4,7 +4,9 @@
         "subject": "Robotics",
         "room": "Robotics lab",
         "start": "10:00 AM",
-        "end": "11:00 AM"
+        "end": "11:00 AM",
+        "attendance_id": "7706d80784c44ef29aa4b394dda3bc59",
+        "attended_dates": []
     },
     {
         "subject": "C Programming",
@@ -15,6 +17,11 @@
         "day": "Wednesday",
         "deleted_dates": [
             "2026-09-30"
+        ],
+        "attendance_id": "13655c1b4aa84654b308a33be6b04108",
+        "attended_dates": [
+            "2026-10-07",
+            "2026-10-14"
         ]
     },
     {
@@ -24,7 +31,9 @@
         "end": "01:00 AM",
         "type": "specific",
         "date": "2026-10-22",
-        "day": "Thursday"
+        "day": "Thursday",
+        "attendance_id": "38454855357a4d9e967587763502b011",
+        "attended_dates": []
     },
     {
         "subject": "ai",
@@ -33,7 +42,11 @@
         "end": "10:00 PM",
         "type": "specific",
         "date": "2026-10-03",
-        "day": "Saturday"
+        "day": "Saturday",
+        "attendance_id": "a94569090f4b47e0a20ce43e13ddfd1f",
+        "attended_dates": [
+            "2026-10-03"
+        ]
     },
     {
         "subject": "ai",
@@ -42,7 +55,11 @@
         "end": "11:00 PM",
         "type": "specific",
         "date": "2026-10-04",
-        "day": "Sunday"
+        "day": "Sunday",
+        "attendance_id": "76266ff56eb346ebb1ee7000371cf6aa",
+        "attended_dates": [
+            "2026-10-04"
+        ]
     },
     {
         "subject": "AI test",
@@ -51,7 +68,11 @@
         "end": "11:30 AM",
         "type": "specific",
         "date": "2026-10-13",
-        "day": "Tuesday"
+        "day": "Tuesday",
+        "attendance_id": "39d79ae0e57048dfa332eb4daaf110cd",
+        "attended_dates": [
+            "2026-10-13"
+        ]
     },
     {
         "subject": "Programming test",
@@ -63,7 +84,9 @@
         "deleted_dates": [
             "2026-10-13",
             "2026-10-06"
-        ]
+        ],
+        "attendance_id": "e99f323867264304bd54e65834953e8d",
+        "attended_dates": []
     },
     {
         "subject": "science",
@@ -72,7 +95,11 @@
         "end": "11:30 AM",
         "type": "specific",
         "date": "2026-10-16",
-        "day": "Friday"
+        "day": "Friday",
+        "attendance_id": "c1dc33e5583b4cb08a9d029076b2585b",
+        "attended_dates": [
+            "2026-10-16"
+        ]
     },
     {
         "subject": "science",
@@ -81,7 +108,11 @@
         "end": "10:00 AM",
         "type": "specific",
         "date": "2026-10-08",
-        "day": "Thursday"
+        "day": "Thursday",
+        "attendance_id": "7cc4d8777b614567b6744a2a935bd09b",
+        "attended_dates": [
+            "2026-10-08"
+        ]
     },
     {
         "subject": "physics",
@@ -90,7 +121,11 @@
         "end": "09:00 AM",
         "type": "specific",
         "date": "2026-10-09",
-        "day": "Friday"
+        "day": "Friday",
+        "attendance_id": "64d954dce4634c6598fec2b3c5ef759d",
+        "attended_dates": [
+            "2026-10-09"
+        ]
     },
     {
         "subject": "geography",
@@ -99,7 +134,11 @@
         "end": "02:00 PM",
         "type": "specific",
         "date": "2026-10-09",
-        "day": "Friday"
+        "day": "Friday",
+        "attendance_id": "40f34d08a52c4b498aa71e783a7155e7",
+        "attended_dates": [
+            "2026-10-09"
+        ]
     },
     {
         "subject": "geography",
@@ -108,7 +147,11 @@
         "end": "02:00 PM",
         "type": "specific",
         "date": "2026-10-10",
-        "day": "Saturday"
+        "day": "Saturday",
+        "attendance_id": "ba53ac229525433d81f36bf77d81b67c",
+        "attended_dates": [
+            "2026-10-10"
+        ]
     },
     {
         "subject": "physics",
@@ -117,7 +160,11 @@
         "end": "11:30 AM",
         "type": "specific",
         "date": "2026-10-05",
-        "day": "Monday"
+        "day": "Monday",
+        "attendance_id": "eab68bbe145c47c2b0c76e8a3452ee4c",
+        "attended_dates": [
+            "2026-10-05"
+        ]
     },
     {
         "subject": "ai",
@@ -126,7 +173,11 @@
         "end": "11:00 AM",
         "type": "specific",
         "date": "2026-10-13",
-        "day": "Tuesday"
+        "day": "Tuesday",
+        "attendance_id": "a5bb3d7493a9498cbd46438dab0f4ec6",
+        "attended_dates": [
+            "2026-10-13"
+        ]
     },
     {
         "subject": "robotics",
@@ -135,6 +186,84 @@
         "end": "10:00 AM",
         "type": "specific",
         "date": "2026-10-12",
-        "day": "Monday"
+        "day": "Monday",
+        "attendance_id": "5693ed61cce745038cd0a06612556bef",
+        "attended_dates": [
+            "2026-10-12"
+        ]
+    },
+    {
+        "attendance_id": "d5aa24037fbd497ab7c34484d6377bac",
+        "attended_dates": [
+            "2026-10-14"
+        ],
+        "subject": "Robotics lab",
+        "room": "301",
+        "start": "09:00 AM",
+        "end": "10:00 AM",
+        "type": "specific",
+        "date": "2026-10-14",
+        "day": "Wednesday"
+    },
+    {
+        "attendance_id": "ab6d9e12feb74f1b9e68a824af5d8172",
+        "attended_dates": [
+            "2026-10-14"
+        ],
+        "subject": "c lab",
+        "room": "301",
+        "start": "09:30 AM",
+        "end": "10:30 AM",
+        "type": "specific",
+        "date": "2026-10-14",
+        "day": "Wednesday"
+    },
+    {
+        "attendance_id": "bab330fe4c04467eb7ba668efb7ecde0",
+        "attended_dates": [
+            "2026-10-16"
+        ],
+        "subject": "vlsi class",
+        "room": "301",
+        "start": "09:00 AM",
+        "end": "10:00 AM",
+        "type": "specific",
+        "date": "2026-10-16",
+        "day": "Friday"
+    },
+    {
+        "attendance_id": "a726465126404850b8ee9f633031ce43",
+        "attended_dates": [
+            "2026-10-16"
+        ],
+        "subject": "c lab",
+        "room": "301",
+        "start": "09:30 AM",
+        "end": "10:30 AM",
+        "type": "specific",
+        "date": "2026-10-16",
+        "day": "Friday"
+    },
+    {
+        "attendance_id": "0c2f1a8601ab4f729b33eb839626439e",
+        "attended_dates": [],
+        "subject": "Physics",
+        "room": "room 301",
+        "start": "09:00 AM",
+        "end": "10:00 AM",
+        "type": "specific",
+        "date": "2026-10-18",
+        "day": "Sunday"
+    },
+    {
+        "attendance_id": "7aadd4fe18d74d2dba7d227a2723d636",
+        "attended_dates": [],
+        "subject": "Chemistry",
+        "room": "room 301",
+        "start": "09:30 AM",
+        "end": "10:30 AM",
+        "type": "specific",
+        "date": "2026-10-18",
+        "day": "Sunday"
     }
 ]
