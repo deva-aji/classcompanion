@@ -352,103 +352,66 @@ def get_conflict_day(
 # -------------------------
 # FIND ALL CONFLICTS
 # -------------------------
-conflicts = []
-classes = st.session_state.classes
-for i in range(len(classes)):
-    for j in range(
-        i + 1,
-        len(classes)
-    ):
-        class_1 = classes[i]
-        class_2 = classes[j]
-        # Ignore conflicts involving specific-date
-        # classes whose scheduled date has passed.
-        if class_1.get("type") == "specific":
+def get_candidate_dates(class_1, class_2):
+    """Dates on which these two classes could clash."""
+    specific_dates = []
+    for c in (class_1, class_2):
+        if c.get("type") == "specific":
             try:
-                class_1_date = datetime.strptime(
-                    class_1["date"],
-                    "%Y-%m-%d"
-                ).date()
-
-                if class_1_date < date.today():
-                    continue
-
+                specific_dates.append(
+                    datetime.strptime(c["date"], "%Y-%m-%d").date()
+                )
             except (KeyError, ValueError, TypeError):
-                pass
+                return []
+    # At least one class is a one-time class: only its date matters.
+    if specific_dates:
+        return [specific_dates[0]]
+    # Both weekly: look at the next 12 weeks, starting today.
+    start_day = date.today()
+    return [start_day + timedelta(days=i) for i in range(84)]
 
-        if class_2.get("type") == "specific":
-            try:
-                class_2_date = datetime.strptime(
-                    class_2["date"],
-                    "%Y-%m-%d"
-                ).date()
 
-                if class_2_date < date.today():
-                    continue
-
-            except (KeyError, ValueError, TypeError):
-                pass
-        # Ignore a specific-date class if the
-        # weekly class was deleted on that date
-        if (
-            class_1.get("type") == "weekly"
-            and class_2.get("type") == "specific"
-        ):
-            specific_date = datetime.strptime(
-                class_2["date"],
-                "%Y-%m-%d"
-            ).date()
-            if (
-                specific_date.strftime("%Y-%m-%d")
-                in class_1.get("deleted_dates", [])
-            ):
+def find_conflicts():
+    """Return only conflicts whose overlapping time has not finished yet."""
+    now = datetime.now()
+    found = []
+    all_classes = st.session_state.classes
+    for i in range(len(all_classes)):
+        for j in range(i + 1, len(all_classes)):
+            class_1 = all_classes[i]
+            class_2 = all_classes[j]
+            if not classes_overlap(class_1, class_2):
                 continue
-        if (
-            class_1.get("type") == "specific"
-            and class_2.get("type") == "weekly"
-        ):
-            specific_date = datetime.strptime(
-                class_1["date"],
-                "%Y-%m-%d"
-            ).date()
-            if (
-                specific_date.strftime("%Y-%m-%d")
-                in class_2.get("deleted_dates", [])
-            ):
-                continue
-        # Check whether both classes
-        # can occur on the same day
-        if not same_schedule_day(
-            class_1,
-            class_2
-        ):
-            continue
-        # Check whether their
-        # times overlap
-        if not classes_overlap(
-            class_1,
-            class_2
-        ):
-            continue
-        # Calculate exact overlap
-        overlap_start, overlap_end = (
-            get_overlap_time(
-                class_1,
-                class_2
+            overlap_start, overlap_end = get_overlap_time(class_1, class_2)
+            overlap_end_minutes = min(
+                time_to_minutes(class_1["end"]),
+                time_to_minutes(class_2["end"])
             )
-        )
-        conflict_day = get_conflict_day(
-            class_1,
-            class_2
-        )
-        conflicts.append({
-            "class_1": class_1,
-            "class_2": class_2,
-            "day": conflict_day,
-            "overlap_start": overlap_start,
-            "overlap_end": overlap_end
-        })
-# -------------------------
+            for candidate in get_candidate_dates(class_1, class_2):
+                # Respects weekdays, specific dates and deleted dates
+                if not (
+                    is_class_active_on_date(class_1, candidate)
+                    and is_class_active_on_date(class_2, candidate)
+                ):
+                    continue
+                overlap_finish = (
+                    datetime.combine(candidate, time(0, 0))
+                    + timedelta(minutes=overlap_end_minutes)
+                )
+                # Conflict is already over, so look at the next occurrence
+                if overlap_finish <= now:
+                    continue
+                found.append({
+                    "class_1": class_1,
+                    "class_2": class_2,
+                    "day": candidate.strftime("%A, %d %B %Y"),
+                    "overlap_start": overlap_start,
+                    "overlap_end": overlap_end,
+                    "overlap_finish": overlap_finish
+                })
+                break  # only the next upcoming occurrence
+    found.sort(key=lambda x: x["overlap_finish"])
+    return found
 
 def render_add_class():
     st.header("➕ Add a Class")
@@ -533,41 +496,43 @@ def render_add_class():
 
 
 def render_conflict_display():
-    st.header("⚠️ Schedule Conflict Alert")
-    # DISPLAY RESULTS
-    # -------------------------
-    if conflicts:
-        st.warning(
-            f"⚠️ **{len(conflicts)} "
-            f"schedule conflict(s) detected.**"
-        )
-        for conflict in conflicts:
-            class_1 = conflict["class_1"]
-            class_2 = conflict["class_2"]
-            st.error(
-                f"📅 **{conflict['day']}**\n\n"
-                f"📚 **{class_1['subject']}**  \n"
-                f"🕐 {class_1['start']} – "
-                f"{class_1['end']}  \n"
-                f"🏫 {class_1['room']}  \n\n"
-                f"📚 **{class_2['subject']}**  \n"
-                f"🕐 {class_2['start']} – "
-                f"{class_2['end']}  \n"
-                f"🏫 {class_2['room']}  \n\n"
-                f"⏰ **Conflicting time: "
-                f"{conflict['overlap_start']} – "
-                f"{conflict['overlap_end']}**"
+    @st.fragment(run_every="30s")
+    def show_conflicts():
+        conflicts = find_conflicts()
+        st.header("⚠️ Schedule Conflict Alert")
+        if conflicts:
+            st.warning(
+                f"⚠️ **{len(conflicts)} "
+                f"schedule conflict(s) detected.**"
             )
-        st.info(
-            "💡 These classes have been saved "
-            "normally. Review the conflicts and "
-            "decide how you want to handle them."
-        )
-    else:
-        st.success(
-            "✅ **No schedule conflicts detected!**"
-        )
-    # -------------------------
+            for conflict in conflicts:
+                class_1 = conflict["class_1"]
+                class_2 = conflict["class_2"]
+                st.error(
+                    f"📅 **{conflict['day']}**\n\n"
+                    f"📚 **{class_1['subject']}**  \n"
+                    f"🕐 {class_1['start']} – "
+                    f"{class_1['end']}  \n"
+                    f"🏫 {class_1['room']}  \n\n"
+                    f"📚 **{class_2['subject']}**  \n"
+                    f"🕐 {class_2['start']} – "
+                    f"{class_2['end']}  \n"
+                    f"🏫 {class_2['room']}  \n\n"
+                    f"⏰ **Conflicting time: "
+                    f"{conflict['overlap_start']} – "
+                    f"{conflict['overlap_end']}**"
+                )
+            st.info(
+                "💡 These classes have been saved "
+                "normally. Review the conflicts and "
+                "decide how you want to handle them."
+            )
+        else:
+            st.success(
+                "✅ **No schedule conflicts detected!**"
+            )
+
+    show_conflicts()
 
 
 def render_weekly_timetable():
