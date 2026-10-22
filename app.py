@@ -1977,7 +1977,8 @@ def render_ai_assistant():
 # -------------------------
 st.markdown("""
 <style>
-.block-container { padding-top: 1rem !important; }
+.block-container { padding-top: 4.5rem !important; }
+[data-testid="stHeader"] { background: transparent !important; }
 [data-testid="stVerticalBlockBorderWrapper"] { padding: .8rem 1rem; }
 [data-testid="stHeading"] h2 { font-size: 1.45rem !important; margin-bottom: .2rem; }
 [data-testid="stHeading"] h3 { font-size: 1.05rem !important; }
