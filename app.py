@@ -3,7 +3,25 @@ import json
 import os
 import calendar
 import uuid
-from datetime import date,datetime,timedelta,time
+from datetime import date as _date, datetime as _datetime, timedelta, time
+from zoneinfo import ZoneInfo
+
+# The server may run in UTC, so the app always uses India time.
+APP_TIMEZONE = ZoneInfo("Asia/Kolkata")
+
+
+class datetime(_datetime):
+    @classmethod
+    def now(cls, tz=None):
+        value = super().now(tz or APP_TIMEZONE)
+        return value if tz else value.replace(tzinfo=None)
+
+
+class date(_date):
+    @classmethod
+    def today(cls):
+        current = _datetime.now(APP_TIMEZONE)
+        return cls(current.year, current.month, current.day)
 st.set_page_config(
     page_title="Student Assistant",
     page_icon="🎓",

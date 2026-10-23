@@ -265,5 +265,16 @@
         "type": "specific",
         "date": "2026-10-19",
         "day": "Monday"
+    },
+    {
+        "attendance_id": "af8b56bdaea048738851280b9b7d60e4",
+        "attended_dates": [],
+        "subject": "physics",
+        "room": "N311D",
+        "start": "11:00 AM",
+        "end": "12:00 PM",
+        "type": "specific",
+        "date": "2026-10-23",
+        "day": "Friday"
     }
 ]
